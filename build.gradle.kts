@@ -2,8 +2,10 @@ plugins {
     kotlin("jvm") version "2.2.20"
 }
 
-group = "cn.afeibaili"
-version = "1.0-SNAPSHOT"
+group = "cn.afeibaili.mchat"
+version = properties["mchat.version"] as String
+
+val jacksonVersion = "2.18.6"
 
 repositories {
     mavenCentral()
@@ -11,6 +13,8 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 }
 
 tasks.test {
