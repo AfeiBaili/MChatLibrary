@@ -2,15 +2,13 @@ package cn.afeibaili.mchat.config
 
 
 /**
- * # 配置类
+ * # 服务端配置类
  *
  * @author AfeiBaili
- * @version 2026/7/17 19:39
+ * @version 2026/7/18 18:12
  */
 
-data class Config(
+open class ServerConfig(
     val token: String,
-    val host: String,
     val port: Int,
-    val name: String,
 )

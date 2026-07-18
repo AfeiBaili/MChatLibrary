@@ -1,6 +1,7 @@
 package cn.afeibaili.mchat.socket
 
 import cn.afeibaili.mchat.cipher.CipherProcessor
+import cn.afeibaili.mchat.config.ServerConfig
 import cn.afeibaili.mchat.logger.Logger
 import cn.afeibaili.mchat.message.MessageParser
 import cn.afeibaili.mchat.message.MessageReader
@@ -20,9 +21,9 @@ import java.util.concurrent.Executors
  * @version 2026/7/18 04:53
  */
 
-class Server(val port: Int, token: String, val parser: MessageParser) : Closeable {
+class Server(val config: ServerConfig, val parser: MessageParser) : Closeable {
     private val server = ServerSocket()
-    private val cipher = CipherProcessor(token)
+    private val cipher = CipherProcessor(config.token)
     private val pool = Executors.newFixedThreadPool(2)
     private val logger = Logger.create("Server")
     private var isAlive = true
@@ -43,7 +44,7 @@ class Server(val port: Int, token: String, val parser: MessageParser) : Closeabl
     fun start() {
         runCatching {
             server.soTimeout = 1000
-            server.bind(InetSocketAddress(port))
+            server.bind(InetSocketAddress(config.port))
             thread.start()
             logger.info("服务器开启成功")
         }.onFailure { logger.error("服务器开启错误: $it") }

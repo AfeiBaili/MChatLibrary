@@ -1,7 +1,6 @@
 package cn.afeibaili.mchat.message
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 
@@ -14,8 +13,9 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 
 sealed class MessageType {
     abstract val source: String
-    abstract val channel: String
     abstract val content: String
+    abstract val channel: String
+
     @get:JsonIgnore
     abstract val identifier: String
 
@@ -28,24 +28,24 @@ sealed class MessageType {
 
     class Text(
         override val source: String,
-        override val channel: String,
         override val content: String,
+        override val channel: String = "",
     ) : MessageType() {
         override val identifier get() = Identifiers.Text.value
     }
 
     class Command(
         override val source: String,
-        override val channel: String,
         override val content: String,
+        override val channel: String = "",
     ) : MessageType() {
         override val identifier get() = Identifiers.Command.value
     }
 
     class Heartbeat(
         override val source: String = "",
-        override val channel: String = "",
         override val content: String = "",
+        override val channel: String = "",
     ) : MessageType() {
         override val identifier get() = Identifiers.Heartbeat.value
         override fun toString(): String = identifier
@@ -53,8 +53,8 @@ sealed class MessageType {
 
     class Image(
         override val source: String,
-        override val channel: String,
         override val content: String,
+        override val channel: String = "",
     ) : MessageType() {
         override val identifier get() = Identifiers.Image.value
     }

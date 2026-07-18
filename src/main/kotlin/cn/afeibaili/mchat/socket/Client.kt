@@ -1,7 +1,7 @@
 package cn.afeibaili.mchat.socket
 
 import cn.afeibaili.mchat.cipher.CipherProcessor
-import cn.afeibaili.mchat.config.Config
+import cn.afeibaili.mchat.config.ClientConfig
 import cn.afeibaili.mchat.logger.Logger
 import cn.afeibaili.mchat.message.HeartbeatTimer
 import cn.afeibaili.mchat.message.MessageParser
@@ -21,7 +21,7 @@ import java.util.concurrent.Executors
  * @version 2026/7/17 20:11
  */
 
-class Client(val config: Config, val parser: MessageParser) : Closeable {
+class Client(val config: ClientConfig, val parser: MessageParser) : Closeable {
     private val cipher = CipherProcessor(config.token)
     private val socket = Socket()
     private val logger = Logger.create("Client")

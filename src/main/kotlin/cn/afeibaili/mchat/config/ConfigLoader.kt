@@ -8,8 +8,4 @@ package cn.afeibaili.mchat.config
  * @version 2026/7/17 19:39
  */
 
-object ConfigLoader {
-    fun load(configPath: String): Config {
-        TODO()
-    }
-}
+object ConfigLoader
