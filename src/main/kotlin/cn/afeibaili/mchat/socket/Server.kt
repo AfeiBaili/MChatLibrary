@@ -30,6 +30,7 @@ class Server(val config: ServerConfig, val parser: MessageParser) : Closeable {
 
     private val clients = mutableSetOf<Socket>()
     private var readers = mutableSetOf<MessageReader>()
+    private val removeList = mutableListOf<Socket>()
 
     private val thread = Thread({
         while (isAlive) {
@@ -53,6 +54,7 @@ class Server(val config: ServerConfig, val parser: MessageParser) : Closeable {
     }
 
     fun send(messageType: MessageType) {
+        removeList.clear()
         clients.forEach { socket ->
             runCatching {
                 val writer: BufferedWriter = socket.outputStream.bufferedWriter()
@@ -60,9 +62,10 @@ class Server(val config: ServerConfig, val parser: MessageParser) : Closeable {
                 writer.flush()
             }.onFailure {
                 logger.info("${socket.remoteSocketAddress}断开了连接: ${it.message}")
-                clients.remove(socket)
+                removeList.add(socket)
             }
         }
+        if (removeList.isNotEmpty()) clients.removeAll(removeList)
     }
 
     override fun close() {
