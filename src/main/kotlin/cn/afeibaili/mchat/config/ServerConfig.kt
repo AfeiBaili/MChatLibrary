@@ -9,6 +9,6 @@ package cn.afeibaili.mchat.config
  */
 
 open class ServerConfig(
-    val token: String,
-    val port: Int,
+    open val token: String,
+    open val port: Int,
 )
