@@ -24,7 +24,7 @@ class MessageReader(socket: Socket, val cipher: CipherProcessor, val parser: Mes
                 paseMessage(message)
             }
             logger.info("读取流已达结尾")
-        }.onFailure { logger.warn("读取流异常关闭") }
+        }
     }, "MessageReader").apply { isDaemon = true }
 
     init {
