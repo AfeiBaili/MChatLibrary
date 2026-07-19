@@ -6,8 +6,8 @@ import cn.afeibaili.mchat.logger.Logger
 import cn.afeibaili.mchat.message.MessageCallback
 import cn.afeibaili.mchat.message.MessageReader
 import cn.afeibaili.mchat.message.MessageType
-import java.io.BufferedWriter
 import java.io.Closeable
+import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.Socket
@@ -31,6 +31,7 @@ class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVer
 
     private val clients = mutableSetOf<Socket>()
     private var readers = mutableSetOf<MessageReader>()
+    private var writers = mutableMapOf<Socket, PrintWriter>()
     private val removeList = mutableListOf<Socket>()
 
     private val thread = Thread({
@@ -41,6 +42,7 @@ class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVer
                 val type: MessageType? = MessageType.fromString(verify)
                 if (type != null) {
                     readers.add(MessageReader(socket, cipher, callbacks))
+                    writers[socket] = PrintWriter(socket.outputStream, true)
                     clients.add(socket)
                     onVerify(type)
                     logger.info("连接进入: ${type.source}")
@@ -62,14 +64,12 @@ class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVer
 
     fun send(messageType: MessageType) {
         removeList.clear()
-        clients.forEach { socket ->
+        writers.forEach { (s, pw) ->
             runCatching {
-                val writer: BufferedWriter = socket.outputStream.bufferedWriter()
-                writer.write(cipher.encrypt(messageType.toString()) + "\n")
-                writer.flush()
+                pw.println(cipher.encrypt(messageType.toString()))
             }.onFailure {
-                logger.info("${socket.remoteSocketAddress}断开了连接: ${it.message}")
-                removeList.add(socket)
+                logger.info("${s.remoteSocketAddress}断开了连接: ${it.message}")
+                removeList.add(s)
             }
         }
         if (removeList.isNotEmpty()) clients.removeAll(removeList)

@@ -21,4 +21,13 @@ class TestMessage {
         println(MessageType.fromString(text.toString()))
         println(cipher.decrypt(encrypt))
     }
+
+    @Test
+    fun testRegex() {
+        val valueRegex = "^\\s*(.*?)\\s*=\\s*(.*?)\\s*$".toRegex()
+
+        val groups: MatchGroupCollection = valueRegex.find("ad=dqd")!!.groups
+        println("[${groups[1]!!.value}]")
+        println("[${groups[2]!!.value}]")
+    }
 }
