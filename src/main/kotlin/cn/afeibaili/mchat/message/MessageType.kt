@@ -81,7 +81,7 @@ sealed class MessageType {
                 Identifiers.Command.value -> Command(source, content, channel)
                 Identifiers.Image.value -> Image(source, content, channel)
                 Identifiers.Heartbeat.value -> Heartbeat(source, content, channel)
-                Identifiers.Verify.value -> Image(source, content, channel)
+                Identifiers.Verify.value -> Verify(source, content, channel)
                 else -> return null
             }
         }

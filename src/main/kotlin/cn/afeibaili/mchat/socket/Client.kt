@@ -47,7 +47,6 @@ class Client(val config: ClientConfig, val callbacks: MessageCallback) : Closeab
     }, "MChatSystem").apply { isDaemon = true }
 
     fun connect() {
-        logger.info("111")
         thread.start()
         logger.info("客户端已启动")
     }

@@ -44,8 +44,7 @@ class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVer
                     clients.add(socket)
                     onVerify(type)
                     logger.info("连接进入: ${type.source}")
-                }
-                socket.close()
+                } else socket.close()
             }
         }
     }, "Server").apply { isDaemon = true }
