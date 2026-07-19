@@ -1,5 +1,7 @@
 package cn.afeibaili.mchat.message
 
+import java.net.Socket
+
 
 /**
  * # 消息解析器
@@ -10,4 +12,5 @@ package cn.afeibaili.mchat.message
 
 class MessageCallback(
     val callbacks: Map<MessageType.Identifiers, (MessageType) -> Unit>,
+    val onMessage: (MessageType, Socket) -> Unit = { _, _ -> },
 )

@@ -12,7 +12,7 @@ import java.net.Socket
  * @version 2026/7/17 20:33
  */
 
-class MessageReader(socket: Socket, val cipher: CipherProcessor, val messageCallback: MessageCallback) : Closeable {
+class MessageReader(val socket: Socket, val cipher: CipherProcessor, val callback: MessageCallback) : Closeable {
     private var isActive = true
     private val reader = socket.inputStream.bufferedReader()
     private val logger = Logger.Companion.create("MessageReader")
@@ -57,9 +57,11 @@ class MessageReader(socket: Socket, val cipher: CipherProcessor, val messageCall
         messageString: String,
     ) {
         println(messageString)
-        val fn: ((MessageType) -> Unit)? = messageCallback.callbacks[type]
+        val fn: ((MessageType) -> Unit)? = callback.callbacks[type]
         fn ?: return
-        fn(MessageType.fromString(messageString) ?: return)
+        val messageType: MessageType = MessageType.fromString(messageString) ?: return
+        fn(messageType)
+        callback.onMessage(messageType, socket)
     }
 
     override fun close() {
