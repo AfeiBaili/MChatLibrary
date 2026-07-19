@@ -1,5 +1,5 @@
 import cn.afeibaili.mchat.config.ClientConfig
-import cn.afeibaili.mchat.message.MessageParser
+import cn.afeibaili.mchat.message.MessageCallback
 import cn.afeibaili.mchat.message.MessageType
 import cn.afeibaili.mchat.socket.Client
 
@@ -16,7 +16,7 @@ class ClientTest {
         fun main(args: Array<String>) {
 
             val client = Client(
-                ClientConfig("hello", "localhost", 33393, "null"), MessageParser(
+                ClientConfig("hello", "localhost", 33393, "null"), MessageCallback(
                     mutableMapOf(
                         MessageType.Identifiers.Text to { message ->
                             println("server: $message")

@@ -12,7 +12,7 @@ import java.net.Socket
  * @version 2026/7/17 20:33
  */
 
-class MessageReader(socket: Socket, val cipher: CipherProcessor, val parser: MessageParser) : Closeable {
+class MessageReader(socket: Socket, val cipher: CipherProcessor, val messageCallback: MessageCallback) : Closeable {
     private var isActive = true
     private val reader = socket.inputStream.bufferedReader()
     private val logger = Logger.Companion.create("MessageReader")
@@ -20,11 +20,13 @@ class MessageReader(socket: Socket, val cipher: CipherProcessor, val parser: Mes
         runCatching {
             var line = ""
             while (isActive && reader.readLine().also { line = it } != null) {
-                val message: String = cipher.decrypt(line)
-                paseMessage(message)
+                runCatching {
+                    val message: String = cipher.decrypt(line)
+                    paseMessage(message)
+                }
             }
             logger.info("读取流已达结尾")
-        }
+        }.onFailure { "读取流已关闭连接" }
     }, "MessageReader").apply { isDaemon = true }
 
     init {
@@ -32,43 +34,32 @@ class MessageReader(socket: Socket, val cipher: CipherProcessor, val parser: Mes
     }
 
     fun paseMessage(message: String) {
-        when {
-            message.startsWith(MessageType.Identifiers.Text.value) -> {
-                matchMessageType<MessageType.Text>(
-                    MessageType.Identifiers.Text,
-                    message.removePrefix(MessageType.Identifiers.Text.value)
-                )
+        when (MessageType.findIdentifier(message)) {
+            MessageType.Identifiers.Text.value -> {
+                matchMessageType(MessageType.Identifiers.Text, message)
             }
 
-            message.startsWith(MessageType.Identifiers.Command.value) -> {
-                matchMessageType<MessageType.Command>(
-                    MessageType.Identifiers.Command,
-                    message.removePrefix(MessageType.Identifiers.Command.value)
-                )
+            MessageType.Identifiers.Command.value -> {
+                matchMessageType(MessageType.Identifiers.Command, message)
             }
 
-            message.startsWith(MessageType.Identifiers.Image.value) -> {
-                matchMessageType<MessageType.Image>(
-                    MessageType.Identifiers.Image,
-                    message.removePrefix(MessageType.Identifiers.Image.value)
-                )
+            MessageType.Identifiers.Image.value -> {
+                matchMessageType(MessageType.Identifiers.Image, message)
             }
 
-            message.startsWith(MessageType.Identifiers.Heartbeat.value) -> {}
+            MessageType.Identifiers.Heartbeat.value -> {}
         }
     }
 
 
-    private inline fun <reified Type : MessageType> matchMessageType(
+    private fun matchMessageType(
         type: MessageType.Identifiers,
-        jsonMessage: String,
+        messageString: String,
     ) {
-
-        println(jsonMessage)
-
-        val fn: ((MessageType) -> Unit)? = parser.messageMap[type]
+        println(messageString)
+        val fn: ((MessageType) -> Unit)? = messageCallback.callbacks[type]
         fn ?: return
-        fn(MessageType.formJson<Type>(jsonMessage) ?: return)
+        fn(MessageType.fromString(messageString) ?: return)
     }
 
     override fun close() {

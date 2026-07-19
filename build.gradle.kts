@@ -15,8 +15,6 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 }
 
 java {

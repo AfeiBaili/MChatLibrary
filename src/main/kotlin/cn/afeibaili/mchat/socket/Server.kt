@@ -3,7 +3,7 @@ package cn.afeibaili.mchat.socket
 import cn.afeibaili.mchat.cipher.CipherProcessor
 import cn.afeibaili.mchat.config.ServerConfig
 import cn.afeibaili.mchat.logger.Logger
-import cn.afeibaili.mchat.message.MessageParser
+import cn.afeibaili.mchat.message.MessageCallback
 import cn.afeibaili.mchat.message.MessageReader
 import cn.afeibaili.mchat.message.MessageType
 import java.io.BufferedWriter
@@ -21,7 +21,8 @@ import java.util.concurrent.Executors
  * @version 2026/7/18 04:53
  */
 
-class Server(val config: ServerConfig, val parser: MessageParser) : Closeable {
+class Server(val config: ServerConfig, val parser: MessageCallback, val onVerify: (MessageType) -> Unit = {}) :
+    Closeable {
     private val server = ServerSocket()
     private val cipher = CipherProcessor(config.token)
     private val pool = Executors.newFixedThreadPool(2)
@@ -36,8 +37,14 @@ class Server(val config: ServerConfig, val parser: MessageParser) : Closeable {
         while (isAlive) {
             runCatching {
                 val socket: Socket = server.accept()
-                readers.add(MessageReader(socket, cipher, parser))
-                clients.add(socket)
+                val verify: String = socket.inputStream.bufferedReader().readLine()
+                val type: MessageType? = MessageType.fromString(verify)
+                if (type != null) {
+                    readers.add(MessageReader(socket, cipher, parser))
+                    clients.add(socket)
+                    onVerify(type)
+                    logger.info("连接进入: ${type.source}")
+                }
             }
         }
     }, "Server").apply { isDaemon = true }

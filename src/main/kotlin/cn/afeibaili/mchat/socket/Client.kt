@@ -3,8 +3,8 @@ package cn.afeibaili.mchat.socket
 import cn.afeibaili.mchat.cipher.CipherProcessor
 import cn.afeibaili.mchat.config.ClientConfig
 import cn.afeibaili.mchat.logger.Logger
+import cn.afeibaili.mchat.message.MessageCallback
 import cn.afeibaili.mchat.message.HeartbeatTimer
-import cn.afeibaili.mchat.message.MessageParser
 import cn.afeibaili.mchat.message.MessageReader
 import cn.afeibaili.mchat.message.MessageType
 import java.io.Closeable
@@ -21,7 +21,7 @@ import java.util.concurrent.Executors
  * @version 2026/7/17 20:11
  */
 
-class Client(val config: ClientConfig, val parser: MessageParser) : Closeable {
+class Client(val config: ClientConfig, val messageCallback: MessageCallback) : Closeable {
     private val cipher = CipherProcessor(config.token)
     private val socket = Socket()
     private val logger = Logger.create("Client")
@@ -34,7 +34,8 @@ class Client(val config: ClientConfig, val parser: MessageParser) : Closeable {
         runCatching {
             socket.connect(InetSocketAddress(config.host, config.port), 5 * 1000)
             writer = PrintWriter(socket.getOutputStream(), true)
-            reader = MessageReader(socket, cipher, parser)
+            send(MessageType.Verify(config.name))
+            reader = MessageReader(socket, cipher, messageCallback)
             heartbeat = HeartbeatTimer(1000 * 60 * 5, socket)
             logger.info("已建立连接")
         }.onFailure {
