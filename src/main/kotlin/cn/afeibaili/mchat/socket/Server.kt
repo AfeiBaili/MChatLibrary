@@ -21,7 +21,7 @@ import java.util.concurrent.Executors
  * @version 2026/7/18 04:53
  */
 
-class Server(val config: ServerConfig, val parser: MessageCallback, val onVerify: (MessageType) -> Unit = {}) :
+class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVerify: (MessageType) -> Unit = {}) :
     Closeable {
     private val server = ServerSocket()
     private val cipher = CipherProcessor(config.token)
@@ -40,7 +40,7 @@ class Server(val config: ServerConfig, val parser: MessageCallback, val onVerify
                 val verify: String = socket.inputStream.bufferedReader().readLine()
                 val type: MessageType? = MessageType.fromString(verify)
                 if (type != null) {
-                    readers.add(MessageReader(socket, cipher, parser))
+                    readers.add(MessageReader(socket, cipher, callbacks))
                     clients.add(socket)
                     onVerify(type)
                     logger.info("连接进入: ${type.source}")
