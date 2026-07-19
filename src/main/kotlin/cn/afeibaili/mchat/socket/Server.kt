@@ -80,6 +80,7 @@ class Server(val config: ServerConfig, val parser: MessageCallback, val onVerify
         pool.shutdown()
         clients.forEach { it.close() }
         readers.forEach { it.close() }
+        removeList.clear()
         isAlive = false
         logger.info("服务器已关闭")
     }
