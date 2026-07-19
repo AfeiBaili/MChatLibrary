@@ -3,8 +3,8 @@ package cn.afeibaili.mchat.socket
 import cn.afeibaili.mchat.cipher.CipherProcessor
 import cn.afeibaili.mchat.config.ClientConfig
 import cn.afeibaili.mchat.logger.Logger
-import cn.afeibaili.mchat.message.MessageCallback
 import cn.afeibaili.mchat.message.HeartbeatTimer
+import cn.afeibaili.mchat.message.MessageCallback
 import cn.afeibaili.mchat.message.MessageReader
 import cn.afeibaili.mchat.message.MessageType
 import java.io.Closeable
@@ -32,7 +32,8 @@ class Client(val config: ClientConfig, val callbacks: MessageCallback) : Closeab
 
     private val thread = Thread({
         runCatching {
-            socket.connect(InetSocketAddress(config.host, config.port), 5 * 1000)
+            socket.soTimeout = 10 * 1000
+            socket.connect(InetSocketAddress(config.host, config.port))
             writer = PrintWriter(socket.getOutputStream(), true)
             send(MessageType.Verify(config.name))
             reader = MessageReader(socket, cipher, callbacks)
@@ -46,6 +47,7 @@ class Client(val config: ClientConfig, val callbacks: MessageCallback) : Closeab
     }, "MChatSystem").apply { isDaemon = true }
 
     fun connect() {
+        logger.info("111")
         thread.start()
         logger.info("客户端已启动")
     }

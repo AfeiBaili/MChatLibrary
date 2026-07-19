@@ -37,7 +37,7 @@ class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVer
         while (isAlive) {
             runCatching {
                 val socket: Socket = server.accept()
-                val verify: String = socket.inputStream.bufferedReader().readLine()
+                val verify: String = cipher.decrypt(socket.inputStream.bufferedReader().readLine())
                 val type: MessageType? = MessageType.fromString(verify)
                 if (type != null) {
                     readers.add(MessageReader(socket, cipher, callbacks))
@@ -52,7 +52,7 @@ class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVer
 
     fun start() {
         runCatching {
-            server.soTimeout = 1000
+            server.soTimeout = 1000 * 10
             server.bind(InetSocketAddress(config.port))
             thread.start()
             logger.info("服务器开启成功")
