@@ -14,7 +14,6 @@ class ClientTest {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-
             val client = Client(
                 ClientConfig("qwd#5q&4e", "afeibaili.cn", 33393, "null"), MessageCallback(
                     mutableMapOf(

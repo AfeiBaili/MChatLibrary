@@ -17,7 +17,7 @@ interface Logger {
 
     companion object {
         private val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd-HH:mm:ss")
-        private val printer = PrintWriter(System.out)
+        private val printer = PrintWriter(System.out, true)
         fun getLogger(name: Any): Logger {
             return object : Logger {
                 override val name: String = name.toString()

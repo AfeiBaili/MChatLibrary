@@ -7,8 +7,6 @@ group = "cn.afeibaili.mchat"
 version = properties["mchat.version"] as String
 val mavenPackageName = "core"
 
-val jacksonVersion = "2.18.6"
-
 repositories {
     mavenCentral()
 }
