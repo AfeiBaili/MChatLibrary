@@ -16,7 +16,7 @@ class ClientTest {
         fun main(args: Array<String>) {
 
             val client = Client(
-                ClientConfig("a", "localhost", 33393, "null"), MessageCallback(
+                ClientConfig("qwd#5q&4e", "afeibaili.cn", 33393, "null"), MessageCallback(
                     mutableMapOf(
                         MessageType.Identifiers.Text to { message ->
                             println("server: $message")
@@ -30,7 +30,7 @@ class ClientTest {
                     val readLine: String? = readLine()
                     if (readLine == null) continue
                     if (readLine == "stop") trues = false
-                    client.send(MessageType.Text("null", "0", readLine))
+                    client.send(MessageType.Text("null", readLine, "null"))
                 }
             }.start()
 

@@ -1,5 +1,6 @@
 package cn.afeibaili.mchat.logger
 
+import java.io.PrintWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -9,13 +10,14 @@ interface Logger {
     fun error(message: Any)
     fun warn(message: Any)
     fun print(level: String, message: Any) {
-        println("[$level] ${getDataTime()} MChatLogger/$name: $message")
+        printer.println("[$level] ${getDataTime()} MChatLogger/$name: $message")
     }
 
     private fun getDataTime() = LocalDateTime.now().format(formatter)
 
     companion object {
         private val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd-HH:mm:ss")
+        private val printer = PrintWriter(System.out)
         fun getLogger(name: Any): Logger {
             return object : Logger {
                 override val name: String = name.toString()
