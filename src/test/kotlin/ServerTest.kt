@@ -25,7 +25,7 @@ class ServerTest {
                 val readLine: String? = readLine()
                 if (readLine == null) continue
                 if (readLine == "stop") isActive = false
-                server.send(MessageType.Text("console", readLine))
+                server.sendAll(MessageType.Text("console", readLine))
             }
         }
     }

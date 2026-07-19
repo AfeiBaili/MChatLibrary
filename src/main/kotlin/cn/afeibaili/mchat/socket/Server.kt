@@ -62,11 +62,12 @@ class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVer
         instance = this@Server
     }
 
-    fun send(messageType: MessageType) {
+    fun sendAll(message: MessageType, ignoreSocket: Socket? = null) {
         removeList.clear()
         writers.forEach { (s, pw) ->
             runCatching {
-                pw.println(cipher.encrypt(messageType.toString()))
+                if (ignoreSocket != s)
+                    pw.println(cipher.encrypt(message.toString()))
             }.onFailure {
                 logger.info("${s.remoteSocketAddress}断开了连接: ${it.message}")
                 removeList.add(s)
