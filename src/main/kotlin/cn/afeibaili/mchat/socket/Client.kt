@@ -32,8 +32,10 @@ class Client(val config: ClientConfig, val callbacks: MessageCallback) : Closeab
 
     private val thread = Thread({
         runCatching {
-            socket.soTimeout = 10 * 1000
-            socket.connect(InetSocketAddress(config.host, config.port))
+            socket.connect(
+                InetSocketAddress(config.host, config.port),
+                10 * 1000
+            )
             writer = PrintWriter(socket.getOutputStream(), true)
             send(MessageType.Verify(config.name))
             reader = MessageReader(socket, cipher, callbacks)
