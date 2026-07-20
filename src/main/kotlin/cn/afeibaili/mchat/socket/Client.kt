@@ -37,7 +37,7 @@ class Client(val config: ClientConfig, val callbacks: MessageCallback) : Closeab
                 10 * 1000
             )
             writer = PrintWriter(socket.getOutputStream(), true)
-            send(MessageType.Verify(config.name))
+            send(MessageType.Verify(config.name, ""))
             reader = MessageReader(socket, cipher, callbacks)
             heartbeat = HeartbeatTimer(1000 * 60 * 5, socket)
             logger.info("已建立连接")

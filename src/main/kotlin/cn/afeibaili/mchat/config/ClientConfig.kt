@@ -13,4 +13,5 @@ open class ClientConfig(
     open val host: String,
     open val port: Int,
     open val name: String,
+    open val channel: String,
 )

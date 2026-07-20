@@ -15,7 +15,7 @@ object ConfigLoader {
     private val regex = "^\\s*\\[.*]\\s*$".toRegex()
     private val valueRegex = "^\\s*(.*?)\\s*=\\s*(.*?)\\s*$".toRegex()
 
-    fun loadClient(): ClientConfig {
+    fun loadClient(): ClientConfig? {
         val file = File(path, "mchat.config")
         if (!file.exists()) {
             file.parentFile.mkdirs()
@@ -31,6 +31,9 @@ object ConfigLoader {
                 appendLine("[ 请使用\"emoji+名称\"的命名方式 ]")
                 appendLine("[ 根据颜色特点可方便区分不同服务器 ]")
                 appendLine("name = 😀服务器")
+                appendLine("[ 隧道名, 服务器规定的隧道方式 ]")
+                appendLine("[ 请填写群聊号多个群号用,指定 ]")
+                appendLine("channel = 1013646161,975709430")
             })
         }
         val lines: List<String> = file.readLines()
@@ -39,6 +42,7 @@ object ConfigLoader {
         var host = ""
         var port = 0
         var name = ""
+        var channel = ""
         lines.forEach { line ->
             if (regex.matches(line)) return@forEach
             runCatching {
@@ -50,13 +54,13 @@ object ConfigLoader {
                     "host" -> host = value
                     "port" -> port = value.toInt()
                     "name" -> name = value
+                    "channel" -> name = value
                 }
-            }.onFailure { throw IllegalStateException("无法解析的配置文件行: $line; $it") }
+            }.onFailure { return null }
         }
 
-        if (token.isEmpty() || host.isEmpty() || port == 0 || name.isEmpty())
-            throw IllegalArgumentException("请检查配置文件是否合规: token=$token, host=$host, port=$port, name=$name")
+        if (token.isEmpty() || host.isEmpty() || port == 0 || name.isEmpty()) return null
 
-        return ClientConfig(token, host, port, name)
+        return ClientConfig(token, host, port, name, channel)
     }
 }
