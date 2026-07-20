@@ -21,7 +21,11 @@ import java.util.concurrent.Executors
  * @version 2026/7/18 04:53
  */
 
-class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVerify: (MessageType) -> Unit = {}) :
+class Server(
+    val config: ServerConfig,
+    val callbacks: MessageCallback,
+    val onVerify: (MessageType, Socket) -> Unit = { _, _ -> },
+) :
     Closeable {
     private val server = ServerSocket()
     private val cipher = CipherProcessor(config.token)
@@ -44,7 +48,7 @@ class Server(val config: ServerConfig, val callbacks: MessageCallback, val onVer
                     readers.add(MessageReader(socket, cipher, callbacks))
                     writers[socket] = PrintWriter(socket.outputStream, true)
                     clients.add(socket)
-                    onVerify(type)
+                    onVerify(type, socket)
                     logger.info("连接进入: ${type.source}")
                 } else socket.close()
             }
