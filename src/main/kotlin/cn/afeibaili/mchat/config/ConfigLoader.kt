@@ -54,12 +54,12 @@ object ConfigLoader {
                     "host" -> host = value
                     "port" -> port = value.toInt()
                     "name" -> name = value
-                    "channel" -> name = value
+                    "channel" -> channel = value
                 }
             }.onFailure { return null }
         }
 
-        if (token.isEmpty() || host.isEmpty() || port == 0 || name.isEmpty()) return null
+        if (token.isEmpty() || host.isEmpty() || port == 0 || name.isEmpty() || channel.isEmpty()) return null
 
         return ClientConfig(token, host, port, name, channel)
     }
