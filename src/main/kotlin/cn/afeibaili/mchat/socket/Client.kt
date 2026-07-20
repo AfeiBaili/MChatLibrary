@@ -21,7 +21,7 @@ import java.util.concurrent.Executors
  * @version 2026/7/17 20:11
  */
 
-class Client(val config: ClientConfig, val callbacks: MessageCallback) : Closeable {
+class Client(val config: ClientConfig, val callbacks: MessageCallback, val verifyChannel: String) : Closeable {
     private val cipher = CipherProcessor(config.token)
     private val socket = Socket()
     private val logger = Logger.create("Client")
@@ -33,11 +33,10 @@ class Client(val config: ClientConfig, val callbacks: MessageCallback) : Closeab
     private val thread = Thread({
         runCatching {
             socket.connect(
-                InetSocketAddress(config.host, config.port),
-                10 * 1000
+                InetSocketAddress(config.host, config.port), 10 * 1000
             )
             writer = PrintWriter(socket.getOutputStream(), true)
-            send(MessageType.Verify(config.name, ""))
+            send(MessageType.Verify(config.name, "", verifyChannel))
             reader = MessageReader(socket, cipher, callbacks)
             heartbeat = HeartbeatTimer(1000 * 60 * 5, socket)
             logger.info("已建立连接")
